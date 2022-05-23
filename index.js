@@ -37,9 +37,26 @@ async function run(){
         await client.connect();
         console.log('database connected')
         const userCollection = client.db('motion-car-parts').collection('user');
+        const productCollection = client.db("motion-car-parts").collection("products");
 
 
-        // user info Api 
+
+        // Product all api
+        app.get("/product", async (req, res) => {
+          const query = {};
+          const cursor = itemCollection.find(query);
+          const products = await cursor.toArray();
+          res.send(products);
+        });
+
+        
+
+        // user info all Api 
+        app.get('/user', async(req, res)=>{
+          const users = await userCollection.find().toArray();
+          res.send(users)
+        })
+
         app.put('/user/:email', async(req, res)=>{
             const email = req.params.email;
             const user = req.body;
