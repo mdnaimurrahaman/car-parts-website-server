@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 5000;
 
@@ -37,19 +37,19 @@ async function run(){
         await client.connect();
         console.log('database connected')
         const userCollection = client.db('motion-car-parts').collection('user');
-        const productCollection = client.db("motion-car-parts").collection("products");
+        const itemCollection = client.db("motion-car-parts").collection("item");
 
 
 
         // Product all api
-        app.get("/product", async (req, res) => {
+        app.get("/item", async (req, res) => {
           const query = {};
           const cursor = itemCollection.find(query);
           const products = await cursor.toArray();
           res.send(products);
         });
 
-        app.get('/product/:id',async(req, res)=>{
+        app.get('/item/:id',async(req, res)=>{
           const id = req.params.id;
           const query={_id: ObjectId(id)};
           const product = await itemCollection.findOne(query);
@@ -57,7 +57,7 @@ async function run(){
       })
 
         // user info all Api 
-        app.get('/user', async(req, res)=>{
+        app.get('/user', verifyJWT, async(req, res)=>{
           const users = await userCollection.find().toArray();
           res.send(users)
         })
@@ -75,6 +75,18 @@ async function run(){
             res.send({result, token });
   
           })
+
+        // create admin user
+        app.put('/user/admin/:email', verifyJWT, verifyAdmin, async(req, res)=>{
+          const email = req.params.email;
+          const filter = {email: email};
+          const updateDoc = {
+            $set: {role: 'admin'},
+          };
+          const result = await userCollection.updateOne(filter, updateDoc);
+          res.send(result);
+
+        })
 
     }
     finally{
