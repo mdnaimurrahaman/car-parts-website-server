@@ -38,6 +38,7 @@ async function run(){
         console.log('database connected')
         const userCollection = client.db('motion-car-parts').collection('user');
         const itemCollection = client.db("motion-car-parts").collection("item");
+        const reviewCollection = client.db("motion-car-parts").collection("reviews");
 
       // verify Admin function:
         const verifyAdmin = async (req, res, next) => {
@@ -81,6 +82,14 @@ async function run(){
         const id = req.params.id;
         const query = {_id: ObjectId(id)};
         const result = await itemCollection.deleteOne(query);
+        res.send(result)
+      })
+
+
+      // reviews api
+      app.post('/review' , async(req,res)=>{
+        const newReview = req.body ;
+        const result = await reviewCollection.insertOne(newReview)
         res.send(result)
       })
 
