@@ -68,6 +68,14 @@ async function run(){
           res.send(product);
       })
 
+      // add new products api
+      app.post('/item', async(req, res)=>{
+        const newItem = req.body;
+        const tokenInfo = req.header.authorization;
+        const result = await itemCollection.insertOne(newItem);
+        res.send(result);
+      })
+
         // user info all Api 
         app.get('/user', verifyJWT, async(req, res)=>{
           const users = await userCollection.find().toArray();
@@ -89,7 +97,7 @@ async function run(){
           })
 
         // create admin user
-        app.put('/user/admin/:email', verifyJWT, async(req, res)=>{
+        app.put('/user/admin/:email', verifyJWT, verifyAdmin, async(req, res)=>{
           const email = req.params.email;
           const filter = {email: email};
           const updateDoc = {
@@ -98,6 +106,14 @@ async function run(){
           const result = await userCollection.updateOne(filter, updateDoc);
           res.send(result);
 
+        })
+
+        // admin checkup Api 
+        app.get('/admin/:email', async(req, res)=>{
+          const email = req.params.email;
+          const user = await userCollection.findOne({email: email});
+          const isAdmin = user.role === 'admin';
+          res.send({admin: isAdmin})
         })
 
     }
