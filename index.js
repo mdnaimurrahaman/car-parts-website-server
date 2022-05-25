@@ -60,8 +60,9 @@ async function run(){
         // Payment api
         app.post("/create-payment-intent", verifyJWT, async (req, res) => {
           const order = req.body;
-          const price = order.price;
-          const amount = price*100;
+          console.log(order)
+          const total = order.total;
+          const amount = total*100;
           const paymentIntent = await stripe.paymentIntents.create({
             amount: amount,
             currency: 'usd',
@@ -72,7 +73,7 @@ async function run(){
 
 
         // Product all api
-        app.get("/item", async (req, res) => {
+        app.get("/item",verifyJWT, async (req, res) => {
           const query = {};
           const cursor = itemCollection.find(query);
           const products = await cursor.toArray();
@@ -87,7 +88,7 @@ async function run(){
       })
 
       // add new products api
-      app.post('/item', async(req, res)=>{
+      app.post('/item',verifyJWT, async(req, res)=>{
         const newItem = req.body;
         const tokenInfo = req.header.authorization;
         const result = await itemCollection.insertOne(newItem);
@@ -104,7 +105,7 @@ async function run(){
 
       // all order get api
 
-      app.get("/order",verifyJWT, verifyAdmin, async (req, res) => {
+      app.get("/allOrder",verifyJWT, verifyAdmin, async (req, res) => {
         const query = {};
         const cursor = orderCollection.find(query);
         const orders = await cursor.toArray();
@@ -115,6 +116,7 @@ async function run(){
        app.get('/order',verifyJWT, async(req,res)=>{
         const email = req.query.email;
         const decodedEmail = req.decoded.email;
+        console.log(decodedEmail,email)
         if(email === decodedEmail){
         const query = {email:email} ;
         const cursor = orderCollection.find(query)
@@ -159,7 +161,7 @@ async function run(){
       })
 
       // order delete api
-      app.delete('/order/:id', async(req, res)=>{
+      app.delete('/order/:id',verifyJWT, async(req, res)=>{
         const id = req.params.id;
         const query = {_id: ObjectId(id)};
         const result = await orderCollection.deleteOne(query);
@@ -174,6 +176,8 @@ async function run(){
         const options = {upsert: true};
         const updateDoc = {
           $set: {
+            name: profile.name,
+            email: profile.email,
             address: profile.address,
             education: profile.education,
             phone: profile.phone,
@@ -191,7 +195,7 @@ async function run(){
       app.get('/profile',verifyJWT, async(req,res)=>{
         const email = req.query.email;
         const query = {email:email} ;
-        const cursor = profileCollection.findOne(query)
+        const cursor = profileCollection.find(query)
         const profile = await cursor.toArray()
         res.send(profile)
       });
