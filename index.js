@@ -192,8 +192,8 @@ async function run(){
         const email = req.query.email;
         const query = {email:email} ;
         const cursor = profileCollection.findOne(query)
-        const order = await cursor.toArray()
-        res.send(order)
+        const profile = await cursor.toArray()
+        res.send(profile)
       });
 
       // reviews api
