@@ -73,7 +73,7 @@ async function run(){
 
 
         // Product all api
-        app.get("/item",verifyJWT, async (req, res) => {
+        app.get("/item", async (req, res) => {
           const query = {};
           const cursor = itemCollection.find(query);
           const products = await cursor.toArray();
@@ -153,6 +153,19 @@ async function run(){
         res.send(updatedDoc)
       });
 
+      // Order Shift api -------------
+      app.patch('/order/:id',verifyJWT, async(req,res)=>{
+        const id = req.params.id;
+        const filter = {_id:ObjectId(id)} ;
+        const updatedDoc = {
+          $set: {
+            Shift: true,
+          }
+        }
+        const updatedOrder = await orderCollection.updateOne(filter, updatedDoc);
+        res.send(updatedOrder)
+      });
+
       //Order Api
       app.post('/order', verifyJWT, async(req,res)=>{
         const newOrder = req.body ;
@@ -201,14 +214,14 @@ async function run(){
       });
 
       // reviews api
-      app.get('/review' , async(req,res)=>{
+      app.get('/review',verifyJWT,  async(req,res)=>{
         const query = {} ;
         const cursor = reviewCollection.find(query)
         const reviews = await cursor.toArray()
         res.send(reviews)
       })
 
-      app.post('/review' , async(req,res)=>{
+      app.post('/review',verifyJWT, async(req,res)=>{
         const newReview = req.body ;
         const result = await reviewCollection.insertOne(newReview)
         res.send(result)
