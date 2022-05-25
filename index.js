@@ -214,7 +214,7 @@ async function run(){
       });
 
       // reviews api
-      app.get('/review',verifyJWT,  async(req,res)=>{
+      app.get('/review', async(req,res)=>{
         const query = {} ;
         const cursor = reviewCollection.find(query)
         const reviews = await cursor.toArray()
