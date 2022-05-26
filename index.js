@@ -166,9 +166,35 @@ async function run(){
         res.send(result)
       })
 
-      // user Order delete api
-      
+      // user my profile all api
+      app.put('/profile/:email',verifyJWT, async(req, res)=>{
+        const email = req.params.email;
+        const profile = req.body;
+        const filter = {email: email};
+        const options = {upsert: true};
+        const updateDoc = {
+          $set: {
+            address: profile.address,
+            education: profile.education,
+            phone: profile.phone,
+            location: profile.location,
+            city: profile.city,
+            country: profile.country,
+            social: profile.social
+          }
+        };
+        const result = await profileCollection.updateOne(filter, updateDoc, options);
+        res.send(result);
+      })
 
+      // user profile info get api
+      app.get('/profile',verifyJWT, async(req,res)=>{
+        const email = req.query.email;
+        const query = {email:email} ;
+        const cursor = profileCollection.findOne(query)
+        const order = await cursor.toArray()
+        res.send(order)
+      });
 
       // reviews api
       app.get('/review' , async(req,res)=>{
