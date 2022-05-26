@@ -41,6 +41,7 @@ async function run(){
         const itemCollection = client.db("motion-car-parts").collection("item");
         const reviewCollection = client.db("motion-car-parts").collection("reviews");
         const orderCollection = client.db("motion-car-parts").collection("orders");
+        const paymentCollection = client.db("motion-car-parts").collection("payments");
 
       // verify Admin function:
         const verifyAdmin = async (req, res, next) => {
@@ -122,6 +123,23 @@ async function run(){
         const query = {_id:ObjectId(id)} ;
         const order = await orderCollection.findOne(query)
         res.send(order)
+      });
+      
+      // order patch api
+      app.patch('/order/:id',verifyJWT, async(req,res)=>{
+        const id = req.params.id;
+        const payment = req.body;
+        console.log(payment)
+        const filter = {_id:ObjectId(id)} ;
+        const updatedDoc = {
+          $set: {
+            paid: true,
+            transactionId: payment.transactionId,
+          }
+        }
+        const result = await paymentCollection.insertOne(payment);
+        const updatedOrder = await orderCollection.updateOne(filter, updatedDoc);
+        res.send(updatedDoc)
       });
 
       //Order Api
