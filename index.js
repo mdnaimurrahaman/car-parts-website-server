@@ -101,6 +101,14 @@ async function run(){
         res.send(result)
       })
 
+      // all order get api
+
+      app.get("/order",verifyJWT, verifyAdmin, async (req, res) => {
+        const query = {};
+        const cursor = orderCollection.find(query);
+        const orders = await cursor.toArray();
+        res.send(orders);
+      });
 
        // Order get api
        app.get('/order',verifyJWT, async(req,res)=>{
