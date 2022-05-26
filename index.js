@@ -156,12 +156,9 @@ async function run(){
       //Order Shift api -------------
       app.patch('/order/:id',verifyJWT, async(req,res)=>{
         const id = req.params.id;
+        const shipping = req.body;
         const filter = {_id:ObjectId(id)} ;
-        const updatedDoc = {
-          $set: {
-            Shift: true,
-          }
-        }
+        const updatedDoc = shipping;
         const updatedOrder = await orderCollection.updateOne(filter, updatedDoc);
         res.send(updatedOrder)
       });
