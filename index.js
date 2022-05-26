@@ -42,6 +42,7 @@ async function run(){
         const reviewCollection = client.db("motion-car-parts").collection("reviews");
         const orderCollection = client.db("motion-car-parts").collection("orders");
         const paymentCollection = client.db("motion-car-parts").collection("payments");
+        const profileCollection = client.db("motion-car-parts").collection("profile");
 
       // verify Admin function:
         const verifyAdmin = async (req, res, next) => {
@@ -154,6 +155,14 @@ async function run(){
       app.post('/order', verifyJWT, async(req,res)=>{
         const newOrder = req.body ;
         const result = await orderCollection.insertOne(newOrder)
+        res.send(result)
+      })
+
+      // order delete api
+      app.delete('/order/:id', async(req, res)=>{
+        const id = req.params.id;
+        const query = {_id: ObjectId(id)};
+        const result = await orderCollection.deleteOne(query);
         res.send(result)
       })
 
